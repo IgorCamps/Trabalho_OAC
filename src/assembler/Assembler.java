@@ -3,18 +3,13 @@ package assembler;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-import org.hamcrest.core.IsNull;
-
-import components.Register;
-
 import architecture.Architecture;
+import components.Register;
 
 public class Assembler {
 	
@@ -206,6 +201,12 @@ public class Assembler {
 		if (p<0){ //the command isn't in the list. So it must have multiple formats
 			if ("move".equals(tokens[0])) //the command is a move
 				p = proccessMove(tokens);
+			if("add".equals(tokens[0]))
+				p = proccessAdd(tokens);
+			if("imul".equals(tokens[0]))
+				p = proccessImul(tokens);
+			if("sub".equals(tokens[0]))
+				p = proccessSub(tokens);
 		}
 		return p;
 	}
@@ -223,8 +224,24 @@ public class Assembler {
 		if ((p1.startsWith("%"))&&(p2.startsWith("%"))) { //this is a moveRegReg comand
 			p = commands.indexOf("moveRegReg");
 		}
+		else { 
+			if((p1.startsWith("&"))&& (p2.startsWith("%"))) { //this is a moveMemReg comand
+				p = commands.indexOf("moveMemReg");
+			}
+			else {
+				if (p1.startsWith("%")) { //this is a moveRegMem comand
+					p2 = "&" + p2;
+					p = commands.indexOf("moveRegMem");
+				}
+				else {
+					p2 = "&" + p2;
+					p = commands.indexOf("moveImmReg");
+				}
+			}
 		return p;
+		}
 	}
+
 
 	/**
 	 * This method creates the executable program from the object program
